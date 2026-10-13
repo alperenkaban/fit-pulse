@@ -144,8 +144,8 @@ Telefonda Geliştirici Menüsünü Açmak:
 --------------------------------------------------------------------------------
 6. FITPULSE UYGULAMA İÇİ MODÜLLER VE KULLANIM REHBERİ
 --------------------------------------------------------------------------------
-FitPulse, ölüm diyetlerini engellemek ve bilimsel form kazandırmak için 4 ana 
-bölümden oluşur:
+FitPulse, yetersiz ve sağlıksız açlık diyetlerini önleyip metabolizmayı koruyarak 
+bilimsel ve kalıcı form kazandırmak için 5 ana modülden oluşur:
 
 1. İLK KURULUM & PROFİL (ONBOARDING)
    - Cinsiyet, yaş, boy, mevcut kilo ve hedef kilo girilir.
