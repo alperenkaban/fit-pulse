@@ -8,6 +8,46 @@ Hazırlayan     : Nova (Yapay Zekâ Geliştirme Ortağı)
 Tarih          : 2026
 
 --------------------------------------------------------------------------------
+PROJE ÖZETİ, AMACI VE TEKNOLOJİ MİMARİSİ
+--------------------------------------------------------------------------------
+1. PROJENİN ÇIKIŞ NOKTASI VE PROBLEM:
+   İnsanlar kilo verme sürecine girdiklerinde çoğunlukla vücutlarını aşırı aç 
+   bırakan (günlük 600-800 kcal gibi) sağlıksız şok diyetlere yönelmektedir. 
+   Bu durum vücudun kendini kıtlık moduna almasına, bazal metabolizmanın 
+   yavaşlamasına, yağ yerine kas ve su kaybına, halsizliğe ve diyet bırakıldığı 
+   anda kiloların hızla geri alınmasına (yo-yo etkisi) yol açar.
+
+2. FITPULSE'IN BİLİMSEL ÇÖZÜMÜ:
+   FitPulse, "Aç kalarak değil, metabolizmanı doğru yakıtlayarak yağ yak" 
+   prensibini benimser:
+   - Mifflin-St Jeor Formülü: Kişinin boy, yaş, kilo ve cinsiyetine göre Bazal 
+     Metabolizma Hızını (BMR) milimetrik olarak hesaplar.
+   - İş & Aktivite Katsayısı (TDEE): Masa başı veya hareketli çalışma temposuna 
+     göre günlük gerçek harcanan enerjiyi belirler ve sağlıklı kalori açığı sunar.
+   - Düşük Kalori Kalkanı: Kullanıcı BMR altına düşecek kadar az kalori aldığında 
+     sistem anında kırmızı uyarı verir, metabolizmayı ve kas dokusunu korur.
+   - EMA (Üstel Kilo Trendi): Günlük su ve ödem dalgalanmalarını filtreleyerek 
+     gerçek yağ kaybı eğrisini gösterir, yetersiz veride sahte tahmin üretmez.
+
+3. ÇİFT PLATFORMLU TEKNOLOJİ MİMARİSİ:
+   - Web Platformu  : HTML5, Modern Vanilla CSS3 (Glassmorphism & Koyu Tema), 
+                      JavaScript, Canvas Grafikler, LocalStorage (Sıfır kurulumla 
+                      herhangi bir tarayıcıda tek tıkla doğrudan çalışır).
+   - Mobil Platform : React Native (Expo SDK 57), TypeScript, 4 sekmeli alt menü, 
+                      AsyncStorage ile çevrimdışı (Offline-First) çalışma garantisi.
+   - Bulut / DB     : PostgreSQL (Supabase) + Row Level Security (RLS) politikaları 
+                      ile kurumsal düzeyde çok kullanıcılı veri güvenliği.
+   - Akıllı Asistan : Barkod okuyucu (kamera) ve tok tutan pratik fit tarifler.
+
+4. TAMAMLANAN GELİŞTİRME FAZLARI (FAZ 1 - FAZ 5):
+   - FAZ 1 (Temel)   : Onboarding ekranı, BMR/TDEE motoru ve veri kalıcılığı.
+   - FAZ 2 (Günlük)  : Takvim gezintisi, 4 öğün beslenme günlüğü ve besin kataloğu.
+   - FAZ 3 (Analiz)  : EMA trend algoritması, periyot özetleri ve veri kalkanı.
+   - FAZ 4 (Güvenlik): Çok kullanıcılı RLS testleri, çökme kurtarma ve EAS Build.
+   - FAZ 5 (Asistan) : Barkod kütüphanesi ve metabolizma dostu tarif motoru.
+
+
+--------------------------------------------------------------------------------
 1. EXPO NEDİR VE NASIL ÇALIŞIR?
 --------------------------------------------------------------------------------
 Expo; React Native tabanlı mobil uygulamaları Android Studio veya Xcode gibi 
