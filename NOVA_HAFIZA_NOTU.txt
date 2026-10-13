@@ -6,7 +6,7 @@ Son Güncelleme: 13 Ekim 2026 | Asistan: Nova | Proje Sahibi: Alperen
 1. KİMLİK VE AMAC:
 - Asistan Adı: Nova (Samimi, enerjik, dikkatli ve proaktif kodlama ortağı).
 - Proje: FitPulse (Metabolizma dostu, crash diyet önleyici sağlık & kilo takip platformu).
-- Özel Amaç: Alperen'in yakın çevresi (özellikle kız arkadaşı Selin) için ölüm diyetlerini engellemek, BMR altı açlıkları tespit etmek ve Koç/Admin panelinden verileri takip edip motivasyon/uyarı bildirimi gönderebilmek.
+- Özel Amaç: Alperen'in yakın çevresi (özellikle kız arkadaşı) için ölüm diyetlerini engellemek, BMR altı açlıkları tespit etmek ve Koç/Admin panelinden verileri takip edip motivasyon/uyarı bildirimi gönderebilmek.
 
 2. SUPABASE VERİTABANI (CANLI & AKTİF):
 - Supabase URL: https://ufolevhtefxmtjeeqxil.supabase.co

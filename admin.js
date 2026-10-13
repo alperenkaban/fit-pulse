@@ -73,7 +73,7 @@ async function fetchAllUsers() {
       if (!usersList.some(u => u.name === lp.name)) {
         usersList.push({
           id: 'local_primary_user',
-          name: lp.name || 'Selin (Ofis)',
+          name: lp.name || 'Danışan (Birincil)',
           email: 'yerel_cihaz@fitpulse.app',
           startWeight: parseFloat(lp.startWeight) || 64,
           currentWeight: parseFloat(lp.currentWeight || lp.startWeight) || 62.5,
@@ -91,9 +91,9 @@ async function fetchAllUsers() {
   // C) Eğer hiç kullanıcı yoksa hazır danışan kartı ekle (Demo ve inceleme için)
   if (usersList.length === 0) {
     usersList.push({
-      id: 'demo_user_selin',
-      name: 'Selin (İş Arkadaşı)',
-      email: 'selin@ofis.com',
+      id: 'demo_user_1',
+      name: 'Danışan (Örnek)',
+      email: 'danisan@fitpulse.app',
       startWeight: 64.0,
       currentWeight: 62.2,
       targetWeight: 56.0,
