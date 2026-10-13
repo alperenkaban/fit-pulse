@@ -137,6 +137,31 @@
     <!-- CONTENT WRAPPER -->
     <main class="main-content">
 
+      <!-- COACH LIVE NOTIFICATION BANNER (Realtime & Push) -->
+      <div id="coachLiveNotifContainer" style="display: none;">
+        <div class="coach-notif-banner">
+          <div class="coach-notif-icon">
+            <i class="fa-solid fa-bell"></i>
+          </div>
+          <div class="coach-notif-content">
+            <h4 id="coachNotifTitle">💬 Koçundan Not</h4>
+            <p id="coachNotifMessage">Burada koçunun gönderdiği mesaj görünecek.</p>
+          </div>
+          <button type="button" class="btn-coach-dismiss" id="dismissCoachNotifBtn">Kapat</button>
+        </div>
+      </div>
+
+      <!-- WEB PUSH PERMISSION PROMPT (iOS / PWA / Web) -->
+      <div id="pushPromptBar" style="display: none; background: rgba(99, 102, 241, 0.15); border: 1px dashed #6366f1; border-radius: 12px; padding: 12px 18px; margin-bottom: 20px; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: #e0e7ff;">
+          <i class="fa-solid fa-bell" style="color: #818cf8; font-size: 18px;"></i>
+          <span>Koçunun uyarı ve motivasyon mesajlarını telefonunda anlık bildirim olarak almak ister misin?</span>
+        </div>
+        <button type="button" id="enablePushBtn" style="background: #6366f1; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; flex-shrink: 0;">
+          Bildirimlere İzin Ver
+        </button>
+      </div>
+
       <!-- WELCOME & SMART HERO BANNER -->
       <section class="hero-status-card">
         <div class="hero-content">
@@ -482,6 +507,8 @@
     </div>
   </div>
 
+  <!-- SUPABASE JS SDK VIA CDN FOR REALTIME COACH NOTIFICATIONS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
 </body>
 </html>

@@ -794,26 +794,193 @@ function showToast(message, type = 'success') {
 /* ==========================================================================
    COACH / ADMIN INCOMING NOTIFICATIONS
    ========================================================================= */
-function checkCoachNotifications() {
-  try {
-    const list = JSON.parse(localStorage.getItem('fitpulse_admin_sent_notifications') || '[]');
-    if (list.length > 0) {
-      // En son gönderilen bildirimi bul
-      const latest = list[0];
-      if (!latest.is_dismissed) {
-        const banner = document.getElementById('coachNotifBanner');
-        if (banner) {
-          document.getElementById('coachNotifTitle').textContent = latest.title || '💬 Koçundan Yeni Mesaj';
-          document.getElementById('coachNotifText').textContent = latest.message;
-          banner.style.display = 'flex';
+/* ==========================================================================
+   COACH / ADMIN LIVE PUSH & REALTIME NOTIFICATIONS (iOS & Web Push)
+   ========================================================================== */
+const SUPABASE_CONFIG = {
+  url: 'https://ufolevhtefxmtjeeqxil.supabase.co',
+  anonKey: 'sb_publishable_SdHTchHRadcFHQnI2TAytA_BcrFM6Fs'
+};
 
-          document.getElementById('dismissCoachNotifBtn').onclick = () => {
-            latest.is_dismissed = true;
-            localStorage.setItem('fitpulse_admin_sent_notifications', JSON.stringify(list));
-            banner.style.display = 'none';
-          };
+let clientSupabase = null;
+
+function checkCoachNotifications() {
+  initPushAndRealtimeNotifications();
+}
+
+function initPushAndRealtimeNotifications() {
+  // 1. Service Worker'ı kaydet (PWA & iOS için gerekli)
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('FitPulse SW hazır:', reg.scope))
+      .catch(err => console.log('SW hatası:', err));
+  }
+
+  // 2. Bildirim İzin Butonu Kontrolü
+  const pushBar = document.getElementById('pushPromptBar');
+  const enableBtn = document.getElementById('enablePushBtn');
+
+  if ('Notification' in window) {
+    if (Notification.permission === 'default' && pushBar) {
+      pushBar.style.display = 'flex';
+    }
+
+    if (enableBtn) {
+      enableBtn.addEventListener('click', async () => {
+        try {
+          const perm = await Notification.requestPermission();
+          if (perm === 'granted') {
+            if (pushBar) pushBar.style.display = 'none';
+            playNotificationChime();
+            showToast('Koç bildirimleri aktif edildi! Bildirimler artık telefonuna gelecek. 🔔');
+          } else {
+            if (pushBar) pushBar.style.display = 'none';
+          }
+        } catch (e) {
+          console.error('Bildirim izin hatası:', e);
+        }
+      });
+    }
+  }
+
+  // 3. Supabase Realtime Bağlantısı
+  if (window.supabase) {
+    try {
+      clientSupabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+
+      // Canlı veritabanı kanalını dinle
+      clientSupabase
+        .channel('client_notifications_channel')
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications'
+        }, payload => {
+          const n = payload.new;
+          if (n) {
+            triggerLiveCoachNotification(n.title, n.message, n.type);
+          }
+        })
+        .subscribe((status) => {
+          console.log('Supabase Realtime durum:', status);
+        });
+
+      // İlk açılışta son bildirimi kontrol et
+      fetchLatestCoachNotification();
+    } catch (e) {
+      console.warn('Supabase Realtime başlatılamadı:', e);
+    }
+  }
+
+  // Kapatma butonu
+  const dismissBtn = document.getElementById('dismissCoachNotifBtn');
+  if (dismissBtn) {
+    dismissBtn.addEventListener('click', () => {
+      const container = document.getElementById('coachLiveNotifContainer');
+      if (container) container.style.display = 'none';
+    });
+  }
+}
+
+// Canlı Bildirim Patlatma Fonksiyonu
+function triggerLiveCoachNotification(title, message, type) {
+  // A) Ses çal
+  playNotificationChime();
+
+  // B) Cihazın kendi yerel Push Bildirimini patlat (iOS & Android)
+  if ('Notification' in window && Notification.permission === 'granted') {
+    const options = {
+      body: message,
+      icon: 'assets/icon.png',
+      badge: 'assets/favicon.png',
+      vibrate: [200, 100, 200]
+    };
+
+    if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+      navigator.serviceWorker.ready.then(reg => {
+        reg.showNotification(title || 'FitPulse • Koçundan Not', options);
+      }).catch(() => {
+        new Notification(title || 'FitPulse • Koçundan Not', options);
+      });
+    } else {
+      new Notification(title || 'FitPulse • Koçundan Not', options);
+    }
+  }
+
+  // C) Uygulama İçi Şık Banner'ı Aç
+  const container = document.getElementById('coachLiveNotifContainer');
+  const titleEl = document.getElementById('coachNotifTitle');
+  const msgEl = document.getElementById('coachNotifMessage');
+
+  if (container && titleEl && msgEl) {
+    titleEl.textContent = title || '💬 Koçundan Not';
+    msgEl.textContent = message;
+    container.style.display = 'block';
+
+    // Sayfayı hafifçe bildirime kaydır
+    container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  showToast(`${title}: ${message}`);
+}
+
+// Supabase'den son gönderilmiş bildirimi çek
+async function fetchLatestCoachNotification() {
+  if (!clientSupabase) return;
+  try {
+    const { data, error } = await clientSupabase
+      .from('notifications')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    if (data && data.length > 0 && !error) {
+      const last = data[0];
+      const dismissedId = localStorage.getItem('fitpulse_last_dismissed_notif');
+      if (dismissedId !== last.id) {
+        const container = document.getElementById('coachLiveNotifContainer');
+        const titleEl = document.getElementById('coachNotifTitle');
+        const msgEl = document.getElementById('coachNotifMessage');
+        if (container && titleEl && msgEl) {
+          titleEl.textContent = last.title;
+          msgEl.textContent = last.message;
+          container.style.display = 'block';
+
+          const dismissBtn = document.getElementById('dismissCoachNotifBtn');
+          if (dismissBtn) {
+            dismissBtn.onclick = () => {
+              localStorage.setItem('fitpulse_last_dismissed_notif', last.id);
+              container.style.display = 'none';
+            };
+          }
         }
       }
     }
+  } catch (e) {
+    console.log('Son bildirim çekilemedi:', e);
+  }
+}
+
+// Zarif Melodi / Ding Sesi (Harici dosya gerektirmez, Web Audio API)
+function playNotificationChime() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+    osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15); // A5
+
+    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 0.5);
   } catch (e) {}
 }

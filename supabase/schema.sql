@@ -134,7 +134,7 @@ create policy "Kullanıcılar sadece kendi öğün kayıtlarını silebilir"
 -- 4. NOTIFICATIONS TABLOSU (Admin/Koç ve Kullanıcı Bildirimleri)
 create table if not exists public.notifications (
   id uuid default gen_random_uuid() primary key,
-  user_id uuid references auth.users on delete cascade not null,
+  user_id uuid references auth.users on delete cascade,
   title text not null,
   message text not null,
   type text check (type in ('warning', 'congrats', 'info', 'reminder')) default 'info',

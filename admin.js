@@ -275,15 +275,22 @@ async function sendNotificationFromAdmin() {
     created_at: new Date().toISOString()
   };
 
-  // A) Supabase'e yazmayı dene
-  if (supabaseClient && adminState.selectedUser.source === 'supabase') {
+  // A) Supabase'e yazmayı dene (Canlı Realtime & Push tetikler)
+  if (supabaseClient) {
     try {
-      await supabaseClient.from('notifications').insert({
-        user_id: adminState.selectedUser.id,
+      const payload = {
         title: newNotif.title,
         message: newNotif.message,
         type: newNotif.type
-      });
+      };
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(adminState.selectedUser.id);
+      if (isUuid) {
+        payload.user_id = adminState.selectedUser.id;
+      }
+      const { error } = await supabaseClient.from('notifications').insert(payload);
+      if (error) {
+        console.warn('Supabase notif insert warning:', error);
+      }
     } catch (e) {
       console.error('Supabase notif insert error:', e);
     }
