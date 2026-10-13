@@ -1,21 +1,23 @@
 ================================================================================
-           FITPULSE • EXPO MOBİL UYGULAMA KAPSAMLI KULLANIM KILAVUZU
+           FITPULSE • EXPO MOBİL & KOÇLUK SİSTEMİ KULLANIM KILAVUZU
 ================================================================================
-Uygulama Adı   : FitPulse (Akıllı Kilo, Metabolizma ve Beslenme Takibi)
-Altyapı        : React Native (Expo SDK 57) + TypeScript
-Platformlar    : Android, iOS ve Web
+Uygulama Adı   : FitPulse (Akıllı Kilo, Metabolizma & Koçluk Takip Platformu)
+Altyapı        : React Native (Expo SDK 57) + TypeScript | Web: HTML5/CSS3/JS
+Bulut DB       : Supabase PostgreSQL (Aktif & RLS Güvenlikli)
+Platformlar    : Android, iOS, Web ve Masaüstü Koç Paneli
 Hazırlayan     : Nova (Yapay Zekâ Geliştirme Ortağı)
-Tarih          : 2026
+Son Güncelleme : 13 Ekim 2026 | Sürüm: 2.1 (Canlı Supabase & Admin Entegre)
+GitHub Deposu  : https://github.com/alperenkaban/fit-pulse
 
 --------------------------------------------------------------------------------
 PROJE ÖZETİ, AMACI VE TEKNOLOJİ MİMARİSİ
 --------------------------------------------------------------------------------
 1. PROJENİN ÇIKIŞ NOKTASI VE PROBLEM:
    İnsanlar kilo verme sürecine girdiklerinde çoğunlukla vücutlarını aşırı aç 
-   bırakan (günlük 600-800 kcal gibi) sağlıksız şok diyetlere yönelmektedir. 
-   Bu durum vücudun kendini kıtlık moduna almasına, bazal metabolizmanın 
-   yavaşlamasına, yağ yerine kas ve su kaybına, halsizliğe ve diyet bırakıldığı 
-   anda kiloların hızla geri alınmasına (yo-yo etkisi) yol açar.
+   bırakan (günlük 600-800 kcal gibi) sağlıksız şok diyetlere (crash diet) 
+   yönelmektedir. Bu durum vücudun kendini kıtlık moduna almasına, bazal 
+   metabolizmanın yavaşlamasına, kas kaybına, halsizliğe ve diyeti bıraktığı anda 
+   kiloların hızla geri alınmasına (yo-yo sendromu) yol açar.
 
 2. FITPULSE'IN BİLİMSEL ÇÖZÜMÜ:
    FitPulse, "Aç kalarak değil, metabolizmanı doğru yakıtlayarak yağ yak" 
@@ -27,208 +29,153 @@ PROJE ÖZETİ, AMACI VE TEKNOLOJİ MİMARİSİ
    - Düşük Kalori Kalkanı: Kullanıcı BMR altına düşecek kadar az kalori aldığında 
      sistem anında kırmızı uyarı verir, metabolizmayı ve kas dokusunu korur.
    - EMA (Üstel Kilo Trendi): Günlük su ve ödem dalgalanmalarını filtreleyerek 
-     gerçek yağ kaybı eğrisini gösterir, yetersiz veride sahte tahmin üretmez.
+     gerçek yağ kaybı eğrisini gösterir, sahte tahmin üretmez.
 
-3. ÇİFT PLATFORMLU TEKNOLOJİ MİMARİSİ:
-   - Web Platformu  : HTML5, Modern Vanilla CSS3 (Glassmorphism & Koyu Tema), 
-                      JavaScript, Canvas Grafikler, LocalStorage (Sıfır kurulumla 
-                      herhangi bir tarayıcıda tek tıkla doğrudan çalışır).
-   - Mobil Platform : React Native (Expo SDK 57), TypeScript, 4 sekmeli alt menü, 
-                      AsyncStorage ile çevrimdışı (Offline-First) çalışma garantisi.
-   - Bulut / DB     : PostgreSQL (Supabase) + Row Level Security (RLS) politikaları 
-                      ile kurumsal düzeyde çok kullanıcılı veri güvenliği.
-   - Akıllı Asistan : Barkod okuyucu (kamera) ve tok tutan pratik fit tarifler.
-
-4. TAMAMLANAN GELİŞTİRME FAZLARI (FAZ 1 - FAZ 5):
-   - FAZ 1 (Temel)   : Onboarding ekranı, BMR/TDEE motoru ve veri kalıcılığı.
-   - FAZ 2 (Günlük)  : Takvim gezintisi, 4 öğün beslenme günlüğü ve besin kataloğu.
-   - FAZ 3 (Analiz)  : EMA trend algoritması, periyot özetleri ve veri kalkanı.
-   - FAZ 4 (Güvenlik): Çok kullanıcılı RLS testleri, çökme kurtarma ve EAS Build.
-   - FAZ 5 (Asistan) : Barkod kütüphanesi ve metabolizma dostu tarif motoru.
-
+3. TEKNOLOJİ MİMARİSİ:
+   - Mobil Platform : React Native (Expo SDK 57), TypeScript, 4 sekmeli modern 
+                      arayüz, AsyncStorage ve Supabase istemcisi.
+   - Web Danışan    : HTML5, Modern Vanilla CSS3 (Glassmorphism & Koyu Tema), 
+                      JavaScript, Canvas Grafikler, Koçtan gelen canlı bildirim barı.
+   - Koç / Admin    : admin.html, admin.js, admin.css ile danışanları anlık izleme, 
+                      aç kalma risklerini tespit etme ve tek tıkla canlı bildirim atma.
+   - Bulut / DB     : Supabase PostgreSQL (URL: https://ufolevhtefxmtjeeqxil.supabase.co)
+                      Tablolar: profiles, weight_logs, meal_logs, notifications.
+                      RLS politikaları ile tam güvenli ve idempotent mimari.
 
 --------------------------------------------------------------------------------
-1. EXPO NEDİR VE NASIL ÇALIŞIR?
+1. MASAÜSTÜ TEK TIKLA BAŞLATICILAR (.BAT DOSYALARI)
 --------------------------------------------------------------------------------
-Expo; React Native tabanlı mobil uygulamaları Android Studio veya Xcode gibi 
-ağır programlara gerek kalmadan, saniyeler içinde bilgisayarında derleyip 
-kendi fiziksel cep telefonunda (Android ya da iPhone) canlı olarak test 
-etmeni sağlayan modern bir mobil ekosistemdir.
+Projeyi çalıştırmak için hiçbir terminal komutu ezberlemene gerek yoktur.
+Masaüstündeki ilgili dosyaya çift tıklaman yeterlidir:
 
-FitPulse mobil uygulaması, bilgisayarında bir yerel geliştirme sunucusu (dev server)
-başlatır ve bir QR kod üretir. Telefonundaki "Expo Go" uygulamasıyla bu QR kodu
-okuttuğun anda, bilgisayarındaki kodlar internet/Wi-Fi üzerinden telefonuna
-aktarılır ve gerçek bir yerel mobil uygulama gibi çalışır.
-
-Kodda herhangi bir şeyi değiştirip kaydettiğinde (Ctrl + S), telefonundaki ekran
-uygulamayı kapatıp açmana gerek kalmadan anında güncellenir (Fast Refresh).
-
+  1. "Mobilyi_Baslat.bat"        -> Expo Mobil Uygulama Geliştirme Sunucusunu açar.
+  2. "Admin_Panelini_Baslat.bat" -> Alperen'in Koç & Danışan Yönetim Panelini açar.
+  3. "Uygulamayı_Baslat.bat"     -> Web Danışan / Kullanıcı Panelini açar.
 
 --------------------------------------------------------------------------------
-2. BİLGİSAYARDA UYGULAMAYI BAŞLATMA (1. ADIM)
+2. KOÇ & ADMİN PANELİ KULLANIM REHBERİ (admin.html)
 --------------------------------------------------------------------------------
-Uygulama klasöründe bulunan hazır başlatıcıyı kullanabilirsin:
+Alperen'in yakın çevresinin (özellikle kız arkadaşı Selin'in) aç kalmasını 
+engellemek ve beslenmesini yakından takip edebilmesi için geliştirilmiştir:
 
-YÖNTEM A (En Pratik):
-  1. Klasördeki "Mobilyi_Baslat.bat" dosyasına çift tıkla.
-  2. Siyah bir terminal penceresi açılacak ve "Metro waiting on exp://..." 
-     yazısıyla birlikte büyük bir QR Kod belirecektir.
-
-YÖNTEM B (Manuel Komut Satırı):
-  1. PowerShell veya CMD terminalini aç.
-  2. Proje dizinine git:
-       cd mobile
-  3. Sunucuyu başlat:
-       npx expo start
-
-
---------------------------------------------------------------------------------
-3. GERÇEK TELEFONDA CANLI AÇMA VE TEST ETME (2. ADIM)
---------------------------------------------------------------------------------
-Telefonunun işletim sistemine göre aşağıdaki adımları izle:
-
-A) ANDROID KULLANICILARI İÇİN:
-   1. Google Play Store'a gir ve "Expo Go" uygulamasını indir (Ücretsizdir).
-   2. Bilgisayarında "Mobilyi_Baslat.bat" çalışırken terminalde beliren 
-      büyük QR Kodu gör.
-   3. Expo Go uygulamasını aç -> "Scan QR code" butonuna dokun.
-   4. Bilgisayar ekranındaki QR kodu tara.
-   5. Uygulama 2-3 saniye içinde yüklenecek ve FitPulse açılacaktır!
-
-B) iOS (iPHONE) KULLANICILARI İÇİN:
-   1. App Store'a gir ve "Expo Go" uygulamasını indir.
-   2. iPhone'unun standart "Kamera" uygulamasını aç.
-   3. Kamerayı bilgisayar terminalindeki QR koda tut.
-   4. Ekranda çıkan sarı "Open in Expo Go" bildirimine dokun.
-   5. FitPulse telefonunda anında çalışmaya başlayacaktır!
-
-
---------------------------------------------------------------------------------
-4. TELEFON BAĞLANMAZSA NE YAPILMALI? (TUNNEL MODU)
---------------------------------------------------------------------------------
-Normal şartlarda telefonunun ve bilgisayarının AYNI WI-FI AĞINA bağlı olması gerekir.
-
-Eğer:
-  - Şirket/ofis Wi-Fi ağındaysan (cihazlar arası iletişimi engelliyor olabilir),
-  - Telefon mobil veride (4.5G/5G), bilgisayar ev internetindeyse,
-  - Ya da QR kodu okutunca "Network response timed out" hatası alıyorsan:
-
-ÇÖZÜM: TUNNEL (TÜNEL) MODU
-  Terminal açıkken sadece "s" tuşuna basarak bağlantı modunu değiştirebilirsin
-  veya doğrudan şu komutla başlatabilirsin:
+  1. Panel Girişi:
+     - "Admin_Panelini_Baslat.bat" dosyasına tıkla (veya tarayıcıda admin.html aç).
   
-       npx expo start --tunnel
-       
-  (Tunnel modu, Expo'nun bulut tünelini kullanarak telefon ile bilgisayarı 
-  farklı internet ağlarında olsalar dahi dünyanın her yerinden birbirine bağlar!)
+  2. Danışan Takip Kartları:
+     - Danışanın başlangıç, şu anki ve hedef kiloları görüntülenir.
+     - Bazal Metabolizma (BMR) ve bugünkü toplam aldığı kalori anlık kıyaslanır.
+     - Eğer danışan BMR altında yetersiz beslenmişse kartın üstünde 
+       "⚠️ Düşük Kalori Uyarısı" kırmızı rozeti belirir.
 
-
---------------------------------------------------------------------------------
-5. TERMINAL KISAYOLLARI VE GELİŞTİRİCİ KONTROLLERİ
---------------------------------------------------------------------------------
-Terminal açıkken klavyeden tek bir tuşa basarak şu işlemleri yapabilirsin:
-
-  [ r ] -> Reload     : Uygulamayı telefonda baştan başlatır / yeniler.
-  [ m ] -> Dev Menu   : Geliştirici menüsünü açar.
-  [ a ] -> Android    : Bilgisayarında açık bir Android Emülatörü varsa orada açar.
-  [ i ] -> iOS        : Mac kullanıyorsan iOS Simulator'de açar.
-  [ w ] -> Web        : Uygulamayı Chrome / Edge web tarayıcısında açar.
-  [ c ] -> Clear      : Terminal ekranını temizler.
-  [ Ctrl + C ]        : Sunucuyu kapatır.
-
-Telefonda Geliştirici Menüsünü Açmak:
-  Uygulama telefonunda açıkken telefonu hafifçe sallarsan (Shake)
-  hata ayıklama ve performans menüsü açılır.
-
+  3. Tek Tıkla Bildirim & Motivasyon Gönderme:
+     - Danışan kartındaki "Bildirim & Motivasyon Gönder" butonuna bas.
+     - Hazır şablonlardan birini seç:
+       * "Tebrik Mesajı": Dengeli beslenme ve su başarısı için motivasyon.
+       * "Açlık Uyarısı": "Dikkat! Kalorin BMR altına düştü, metabolizmanı koru!" uyarısı.
+       * "Su Molası": Yağ yakımını hızlandırmak için 2L su hatırlatması.
+       * "Öğün Önerisi": Akşam için sağlıklı fit ara öğün tavsiyesi.
+     - "Gönder" butonuna basıldığında mesaj Supabase üzerinden danışanın ekranına düşer.
 
 --------------------------------------------------------------------------------
-6. FITPULSE UYGULAMA İÇİ MODÜLLER VE KULLANIM REHBERİ
+3. EXPO MOBİL UYGULAMAYI BAŞLATMA VE TELEFONDA AÇMA
 --------------------------------------------------------------------------------
-FitPulse, yetersiz ve sağlıksız açlık diyetlerini önleyip metabolizmayı koruyarak 
-bilimsel ve kalıcı form kazandırmak için 5 ana modülden oluşur:
+Expo sayesinde Android Studio veya Xcode kurmadan kendi telefonunda saniyeler 
+içinde canlı test yapabilirsin:
 
-1. İLK KURULUM & PROFİL (ONBOARDING)
-   - Cinsiyet, yaş, boy, mevcut kilo ve hedef kilo girilir.
-   - Çalışma şekli / hareket seviyesi seçilir (Masa başı iş, hafif aktif, vb.).
-   - Uygulama, Mifflin-St Jeor formülüyle kişinin Bazal Metabolizmasını (BMR) 
-     ve Günlük Enerji İhtiyacını (TDEE) milimetrik olarak hesaplar.
+1. BİLGİSAYARDA BAŞLAT:
+   - "Mobilyi_Baslat.bat" dosyasına çift tıkla.
+   - Siyah terminal penceresinde büyük bir QR Kod belirecektir.
 
-2. METABOLİZMA SEKMESİ (ANA SAYFA)
-   - Kalan kilo, başlangıç kilosu ve tahmini varış süresi (gün/hafta) görüntülenir.
-   - Düşük Kalori Kalkanı: Kullanıcı BMR değerinin altında yetersiz kalori alırsa 
-     kırmızı acil durum uyarısı verir, kas kaybını ve metabolizma yavaşlamasını önler.
-   - Hedef kalori ve su tüketim durumu anlık izlenir.
+2. TELEFONDA AÇ:
+   A) Android:
+      - Google Play'den "Expo Go" uygulamasını indir.
+      - Expo Go -> "Scan QR code" butonuna dokunup bilgisayardaki QR kodu tara.
+   B) iPhone (iOS):
+      - App Store'dan "Expo Go" indir.
+      - iPhone'un normal Kamerasını açıp QR koda tut -> "Open in Expo Go" de.
+   
+3. FAST REFRESH:
+   - Kodda bir değişiklik yapıp kaydettiğinde telefon ekranı anında güncellenir.
 
-3. GÜNLÜK & BESLENME TAKİVİMİ (DIARY)
-   - Üst kısımdaki dinamik takvimden bugüne veya geçmiş günlere tek tıkla gidilir.
-   - 4 Ayrı Öğün: Sabah Kahvaltısı, Öğle Yemeği, Akşam Yemeği, Ara Öğün.
-   - Besin Arama: Zengin Türk mutfağı ve diyet kataloğundan (Yulaf, Lor peyniri, 
-     Tavuk göğsü, Zeytinyağlılar vb.) porsiyon veya gramaj seçerek ekleme yapılır.
-   - Kalori, Protein, Karbonhidrat ve Yağ toplamları anında toplanır.
-   - İstediğin öğünü tek tıkla silebilir veya düzenleyebilirsin.
+--------------------------------------------------------------------------------
+4. BAĞLANTI SORUNU YAŞANIRSA (TUNNEL / TÜNEL MODU)
+--------------------------------------------------------------------------------
+Normalde bilgisayar ile telefonun AYNI Wi-Fi ağında olması gerekir.
+Eğer farklı ağlardaysanız veya şirket/ofis interneti cihazlar arası iletişimi 
+engelliyorsa:
 
-4. TARİF VE BARKOD ASİSTANI (RECIPE & BARCODE)
-   - Barkod Okuyucu: Marketten alınan hazır ürünlerin barkodu girilerek 
-     kalori ve protein değerleri anında bulunur.
-   - Fit ve Sağlıklı Tarifler: Yüksek proteinli, tok tutan ve metabolizmayı 
-     canlandıran lezzetli tarifler ve hazırlanış adımları listelenir.
+   Terminal açıkken klavyeden "s" tuşuna bas veya terminale şu komutu ver:
+   
+        npx expo start --tunnel
 
-5. ANALİZ & KİLO TRENDİ (ANALYTICS)
-   - Kilo Eğilimi (EMA - Üstel Hareketli Ortalama): Günlük ödem ve su dalgalanmalarını 
-     filtreleyerek gerçek yağ kaybı eğrisini gösterir.
-   - Haftalık ve Aylık Özet: Alınan ortalama kalori ve kilo değişimi.
-   - Güvenilir Veri Kalkanı: Eğer sisteme en az 4 günlük kilo verisi girilmemişse, 
-     kullanıcıyı yanıltmamak için sahte tahmin üretmez; net veri talep eder.
+   Tunnel modu bulut sunucuları üzerinden telefonunu bilgisayarına dünyanın her 
+   yerinden bağlar.
 
+--------------------------------------------------------------------------------
+5. TERMINAL KISAYOLLARI
+--------------------------------------------------------------------------------
+Terminal açıkken klavyeden tek bir tuşa basarak işlem yapabilirsin:
+   [ r ] -> Reload     : Uygulamayı telefonda baştan başlatır / yeniler.
+   [ m ] -> Dev Menu   : Telefonda geliştirici menüsünü açar.
+   [ a ] -> Android    : Açık bir Android Emülatörü varsa orada açar.
+   [ w ] -> Web        : Uygulamayı Chrome / Edge web tarayıcısında açar.
+   [ c ] -> Clear      : Terminal ekranını temizler.
+   [ Ctrl + C ]        : Sunucuyu kapatır.
+
+--------------------------------------------------------------------------------
+6. FITPULSE MOBİL MODÜLLERİ (5 ANA MODÜL)
+--------------------------------------------------------------------------------
+1. İLK KURULUM & PROFİL (ONBOARDING):
+   - Boy, yaş, cinsiyet, mevcut ve hedef kilo girilir.
+   - Mifflin-St Jeor formülüyle BMR ve TDEE milimetrik hesaplanır.
+
+2. METABOLİZMA SEKMESİ (ANA SAYFA):
+   - Kalan kilo ve tahmini varış süresi gösterilir.
+   - Koçtan gelen canlı uyarı veya tebrik bildirimleri üst bildirim çubuğunda gösterilir.
+   - Düşük Kalori Kalkanı: BMR altı açlıklarda kırmızı alarm verir.
+
+3. GÜNLÜK & BESLENME TAKVİMİ (DIARY):
+   - Takvimden bugüne veya geçmişe gidilir.
+   - 4 Öğün: Sabah, Öğle, Akşam, Ara Öğün.
+   - Porsiyon veya gramaj seçilerek Türk mutfağı ve fit besinler eklenir.
+
+4. TARİF VE BARKOD ASİSTANI (RECIPE & BARCODE):
+   - Barkod Okuyucu: Market ürünlerinin barkodunu girip değerlerini bulma.
+   - Fit Tarifler: Yüksek proteinli, tok tutan pratik lezzetler.
+
+5. ANALİZ & KİLO TRENDİ (ANALYTICS):
+   - EMA (Üstel Hareketli Ortalama): Günlük ödemleri filtreleyip gerçek yağ kaybını çizer.
+   - Güvenilir Veri Kalkanı: Yetersiz veride sahte tahmin üretmez.
 
 --------------------------------------------------------------------------------
 7. BAĞIMSIZ APK DOSYASI ÇIKARMA (EXPO GO OLMADAN YÜKLEME)
 --------------------------------------------------------------------------------
-Eğer uygulamayı karşı tarafa doğrudan telefonuna tek tıkla kurabileceği 
-bir `.apk` dosyası olarak göndermek istersen:
-
-  1. Terminalde mobile klasörüne git:
-       cd mobile
-  2. Preview APK derlemesi başlat:
-       npx eas build --profile preview --platform android
-  3. Derleme Expo bulut sunucularında tamamlanır (bilgisayarını yormaz).
-  4. İşlem bitince terminalde sana bir indirme linki (.apk) verilir.
-  5. Bu linki doğrudan telefona atıp kurabilirsin.
-
+Uygulamayı birine doğrudan yüklenebilir .apk dosyası olarak göndermek istersen:
+   1. Terminalde mobile klasörüne git:
+        cd mobile
+   2. Preview APK derlemesi başlat:
+        npx eas build --profile preview --platform android
+   3. Expo bulut sunucuları işlemi tamamlayınca terminalde .apk indirme linki verir.
 
 --------------------------------------------------------------------------------
 8. SIK KARŞILAŞILAN SORUNLAR & HIZLI ÇÖZÜMLER
 --------------------------------------------------------------------------------
-SORUN 1: "QR Kodu okutuyorum ama telefon bağlanmıyor / zaman aşımına uğruyor."
-ÇÖZÜM  : Bilgisayar ve telefonun aynı Wi-Fi'da olduğundan emin ol. Sorun sürerse 
-         terminale `npx expo start --tunnel` yazarak Tunnel modunu kullan.
+SORUN 1: "QR Kodu okutuyorum ama telefon bağlanmıyor."
+ÇÖZÜM  : `npx expo start --tunnel` komutu ile Tunnel modunu kullan.
 
-SORUN 2: "Windows Güvenlik Duvarı (Firewall) uyarısı çıktı."
-ÇÖZÜM  : Node.js için "Özel Ağlar" ve "Ortak Ağlar" kutucuklarını işaretleyip 
-         "Erişime İzin Ver" butonuna tıkla.
+SORUN 2: "Port 8081 is already in use hatası."
+ÇÖZÜM  : Terminali kapatıp `npx expo start --clear` komutunu çalıştır.
 
-SORUN 3: "Port 8081 is already in use hatası."
-ÇÖZÜM  : Önceki bir oturum arka planda kalmıştır. Terminali kapatıp 
-         `npx expo start --clear` komutunu çalıştır.
-
-SORUN 4: "Telefonda ekran beyaz kaldı veya açılmadı."
-ÇÖZÜM  : Telefonu salla ve "Reload" seçeneğine bas ya da Expo Go uygulamasını 
-         kapatıp baştan aç.
-
+SORUN 3: "Supabase'de SQL hatası (ERROR 42710)."
+ÇÖZÜM  : supabase/schema.sql dosyasındaki güncel kod 'DROP POLICY IF EXISTS' 
+         içerdiğinden artık hiçbir zaman bu hatayı vermez.
 
 --------------------------------------------------------------------------------
-9. GITHUB REPO YEDEKLEME VE ERİŞİM BİLGİSİ
+9. GITHUB REPO BİLGİSİ
 --------------------------------------------------------------------------------
-GitHub Token Dosyası: GITHUB_TOKEN.txt (Klasör içinde yerel olarak saklanmaktadır)
-Token Türü          : Personal Access Token (Classic)
-Kullanım Şekli      :
-  git remote set-url origin https://<TOKEN>@github.com/<KULLANICI_ADI>/<REPO>.git
-  git push -u origin main
-
-* Güvenlik nedeniyle token dosyası ve ortam değişkenleri (.env) .gitignore 
-  içerisine eklenmiş olup internete açık repolara sızması engellenmiştir.
+Depo Adresi : https://github.com/alperenkaban/fit-pulse
+Güvenlik    : GITHUB_TOKEN.txt ve .env dosyaları .gitignore ile korunmaktadır.
 
 ================================================================================
-FitPulse Mobil, tamamen hazır, TypeScript hatasız ve stabil durumdadır!
-Başlatmak için masaüstündeki "Mobilyi_Baslat.bat" dosyasını çalıştırman yeterlidir.
+FitPulse; Web, Mobil, Koçluk Paneli ve Supabase ile eksiksiz kullanıma hazırdır!
 ================================================================================
