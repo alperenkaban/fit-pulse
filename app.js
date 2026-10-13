@@ -865,12 +865,39 @@ function initPushAndRealtimeNotifications() {
           console.log('Supabase Realtime durum:', status);
         });
 
-      // İlk açılışta son bildirimi kontrol et
+      // İlk açılışta ve 4 saniyede bir son bildirimi kontrol et (Polling Fallback)
       fetchLatestCoachNotification();
+      setInterval(fetchLatestCoachNotification, 4000);
     } catch (e) {
       console.warn('Supabase Realtime başlatılamadı:', e);
     }
   }
+
+  // 4. Yerel Sekmeler İçin BroadcastChannel Dinleyicisi (0ms Anında Tepki)
+  try {
+    if (window.BroadcastChannel) {
+      const bc = new BroadcastChannel('fitpulse_coach_channel');
+      bc.onmessage = (event) => {
+        const n = event.data;
+        if (n) {
+          triggerLiveCoachNotification(n.title, n.message, n.type);
+        }
+      };
+    }
+  } catch (e) {}
+
+  // 5. Yerel Storage Değişimi Dinleyicisi (Ek Güvence)
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'fitpulse_admin_sent_notifications') {
+      try {
+        const list = JSON.parse(e.newValue || '[]');
+        if (list.length > 0) {
+          const latest = list[0];
+          triggerLiveCoachNotification(latest.title, latest.message, latest.type);
+        }
+      } catch (err) {}
+    }
+  });
 
   // Kapatma butonu
   const dismissBtn = document.getElementById('dismissCoachNotifBtn');
@@ -884,26 +911,31 @@ function initPushAndRealtimeNotifications() {
 
 // Canlı Bildirim Patlatma Fonksiyonu
 function triggerLiveCoachNotification(title, message, type) {
-  // A) Ses çal
+  // A) Ses çal (Ding efekti)
   playNotificationChime();
 
-  // B) Cihazın kendi yerel Push Bildirimini patlat (iOS & Android)
+  // B) Cihazın kendi yerel Push Bildirimini patlat (Windows, Mac, iOS, Android)
   if ('Notification' in window && Notification.permission === 'granted') {
     const options = {
       body: message,
       icon: 'assets/icon.png',
       badge: 'assets/favicon.png',
-      vibrate: [200, 100, 200]
+      tag: 'fitpulse-coach-notif',
+      renotify: true
     };
 
-    if (navigator.serviceWorker && navigator.serviceWorker.ready) {
-      navigator.serviceWorker.ready.then(reg => {
-        reg.showNotification(title || 'FitPulse • Koçundan Not', options);
-      }).catch(() => {
+    try {
+      if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.ready.then(reg => {
+          reg.showNotification(title || 'FitPulse • Koçundan Not', options);
+        }).catch(() => {
+          try { new Notification(title || 'FitPulse • Koçundan Not', options); } catch (e) {}
+        });
+      } else {
         new Notification(title || 'FitPulse • Koçundan Not', options);
-      });
-    } else {
-      new Notification(title || 'FitPulse • Koçundan Not', options);
+      }
+    } catch (e) {
+      console.log('Bildirim API hatası:', e);
     }
   }
 
@@ -925,6 +957,8 @@ function triggerLiveCoachNotification(title, message, type) {
 }
 
 // Supabase'den son gönderilmiş bildirimi çek
+let lastProcessedNotifId = null;
+
 async function fetchLatestCoachNotification() {
   if (!clientSupabase) return;
   try {
@@ -937,22 +971,19 @@ async function fetchLatestCoachNotification() {
     if (data && data.length > 0 && !error) {
       const last = data[0];
       const dismissedId = localStorage.getItem('fitpulse_last_dismissed_notif');
-      if (dismissedId !== last.id) {
-        const container = document.getElementById('coachLiveNotifContainer');
-        const titleEl = document.getElementById('coachNotifTitle');
-        const msgEl = document.getElementById('coachNotifMessage');
-        if (container && titleEl && msgEl) {
-          titleEl.textContent = last.title;
-          msgEl.textContent = last.message;
-          container.style.display = 'block';
+      
+      // Eğer bu bildirim daha önce gösterilmediyse ve kapatılmadıysa
+      if (dismissedId !== last.id && lastProcessedNotifId !== last.id) {
+        lastProcessedNotifId = last.id;
+        triggerLiveCoachNotification(last.title, last.message, last.type);
 
-          const dismissBtn = document.getElementById('dismissCoachNotifBtn');
-          if (dismissBtn) {
-            dismissBtn.onclick = () => {
-              localStorage.setItem('fitpulse_last_dismissed_notif', last.id);
-              container.style.display = 'none';
-            };
-          }
+        const dismissBtn = document.getElementById('dismissCoachNotifBtn');
+        if (dismissBtn) {
+          dismissBtn.onclick = () => {
+            localStorage.setItem('fitpulse_last_dismissed_notif', last.id);
+            const container = document.getElementById('coachLiveNotifContainer');
+            if (container) container.style.display = 'none';
+          };
         }
       }
     }

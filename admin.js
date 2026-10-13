@@ -283,10 +283,13 @@ async function sendNotificationFromAdmin() {
         message: newNotif.message,
         type: newNotif.type
       };
-      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(adminState.selectedUser.id);
-      if (isUuid) {
-        payload.user_id = adminState.selectedUser.id;
+      let targetUserId = adminState.selectedUser ? adminState.selectedUser.id : null;
+      const isUuid = targetUserId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(targetUserId);
+      if (!isUuid) {
+        targetUserId = '9544eb9b-00ea-4582-8845-9933df5ac564'; // Varsayılan danışan UUID'si
       }
+      payload.user_id = targetUserId;
+
       const { error } = await supabaseClient.from('notifications').insert(payload);
       if (error) {
         console.warn('Supabase notif insert warning:', error);
@@ -296,7 +299,16 @@ async function sendNotificationFromAdmin() {
     }
   }
 
-  // B) Yerel depoya kaydet
+  // B) Yerel Sekmeler İçin Anında Broadcast (0ms Gecikmesiz İletim)
+  try {
+    if (window.BroadcastChannel) {
+      const bc = new BroadcastChannel('fitpulse_coach_channel');
+      bc.postMessage(newNotif);
+      setTimeout(() => bc.close(), 1000);
+    }
+  } catch (e) {}
+
+  // C) Yerel depoya kaydet
   let savedNotifs = [];
   try {
     savedNotifs = JSON.parse(localStorage.getItem('fitpulse_admin_sent_notifications') || '[]');
