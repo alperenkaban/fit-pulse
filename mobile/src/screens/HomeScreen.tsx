@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -11,6 +11,7 @@ import {
   View
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
+import { isDemoConfig, supabase } from '../lib/supabase';
 import { calculateMetabolismMetrics, runBmrTdeeVerificationTests } from '../services/calculator';
 
 interface HomeScreenProps {
@@ -23,6 +24,36 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onOpenSettings }) => {
   const [calorieInput, setCalorieInput] = useState('');
   const [loggedCalories, setLoggedCalories] = useState<number | undefined>(undefined);
   const [verificationResults, setVerificationResults] = useState<string[] | null>(null);
+  const [coachNotification, setCoachNotification] = useState<{ id: string; title: string; message: string } | null>(null);
+
+  useEffect(() => {
+    fetchCoachNotification();
+  }, [profile]);
+
+  const fetchCoachNotification = async () => {
+    if (!profile) return;
+    try {
+      if (!isDemoConfig) {
+        const { data } = await supabase
+          .from('notifications')
+          .select('*')
+          .eq('user_id', profile.id)
+          .eq('is_read', false)
+          .order('created_at', { ascending: false })
+          .limit(1);
+        if (data && data.length > 0) {
+          setCoachNotification(data[0]);
+        }
+      }
+    } catch (e) {}
+  };
+
+  const handleDismissCoachNotification = async () => {
+    if (coachNotification && !isDemoConfig) {
+      await supabase.from('notifications').update({ is_read: true }).eq('id', coachNotification.id);
+    }
+    setCoachNotification(null);
+  };
 
   const metrics = useMemo(() => {
     if (!profile) return null;
@@ -87,6 +118,19 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onOpenSettings }) => {
             <Text style={styles.settingsBtnText}>⚙️ Profil</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Koçtan Gelen Bildirim Kartı */}
+        {coachNotification && (
+          <View style={styles.coachNotifCard}>
+            <View style={styles.coachNotifHeader}>
+              <Text style={styles.coachNotifTitle}>{coachNotification.title}</Text>
+              <TouchableOpacity onPress={handleDismissCoachNotification}>
+                <Text style={styles.coachNotifClose}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.coachNotifMsg}>{coachNotification.message}</Text>
+          </View>
+        )}
 
         {/* Düşük Kalori Uyarısı Kalkanı */}
         {metrics.isCrashDiet && (
@@ -288,6 +332,35 @@ const styles = StyleSheet.create({
     color: '#fca5a5',
     fontSize: 12.5,
     lineHeight: 18,
+  },
+  coachNotifCard: {
+    backgroundColor: 'rgba(99, 102, 241, 0.22)',
+    borderColor: 'rgba(99, 102, 241, 0.45)',
+    borderWidth: 1,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+  },
+  coachNotifHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  coachNotifTitle: {
+    color: '#c7d2fe',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  coachNotifClose: {
+    color: '#94a3b8',
+    fontSize: 16,
+    paddingHorizontal: 6,
+  },
+  coachNotifMsg: {
+    color: '#f8fafc',
+    fontSize: 13.5,
+    lineHeight: 19,
   },
   heroCard: {
     backgroundColor: 'rgba(23, 31, 48, 0.85)',

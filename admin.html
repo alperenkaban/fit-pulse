@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FitPulse • Koç & Yönetici Paneli</title>
+  <meta name="description" content="Danışanların kilo, kalori ve metabolizma takibi; özel motivasyon ve düşük kalori uyarı bildirimleri gönderme paneli.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <!-- Ambient Glow -->
+  <div class="bg-glow glow-1"></div>
+  <div class="bg-glow glow-2"></div>
+
+  <!-- TOP NAVBAR -->
+  <header class="admin-navbar">
+    <div class="brand-wrapper">
+      <div class="brand-icon">
+        <i class="fa-solid fa-crown"></i>
+      </div>
+      <div>
+        <h1 class="brand-title">FitPulse <span>Coach</span></h1>
+        <span class="badge-coach-role"><i class="fa-solid fa-shield-halved"></i> Beslenme Koçu & Yönetici</span>
+      </div>
+    </div>
+
+    <div class="nav-actions">
+      <div class="live-pill">
+        <span class="live-dot"></span>
+        <span>Canlı Veritabanı: <strong>Supabase</strong></span>
+      </div>
+      <button class="btn-header" id="refreshBtn" title="Verileri Yenile">
+        <i class="fa-solid fa-arrows-rotate"></i> Yenile
+      </button>
+      <a href="index.html" class="btn-header" target="_blank" title="Kullanıcı Görünümünü Aç">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i> Danışan Arayüzü
+      </a>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="admin-container">
+
+    <!-- HERO METRIC STATS -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-card-top">
+          <span class="stat-title">Takip Edilen Danışanlar</span>
+          <div class="stat-icon-wrap purple"><i class="fa-solid fa-users"></i></div>
+        </div>
+        <div class="stat-val-big" id="statTotalUsers">0</div>
+        <div class="stat-sub">Kayıtlı kullanıcı sayısı</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-top">
+          <span class="stat-title">Bugün Aktif Olanlar</span>
+          <div class="stat-icon-wrap green"><i class="fa-solid fa-circle-check"></i></div>
+        </div>
+        <div class="stat-val-big" id="statActiveToday">0</div>
+        <div class="stat-sub">Veri girişi yapan danışan</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-top">
+          <span class="stat-title">Düşük Kalori Uyarısı</span>
+          <div class="stat-icon-wrap red"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        </div>
+        <div class="stat-val-big" style="color: #f87171;" id="statRiskUsers">0</div>
+        <div class="stat-sub">Aç kalma riski olanlar</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-top">
+          <span class="stat-title">Ortalama Kilo Kaybı</span>
+          <div class="stat-icon-wrap orange"><i class="fa-solid fa-fire-flame-curved"></i></div>
+        </div>
+        <div class="stat-val-big" id="statAvgLost">0.0 kg</div>
+        <div class="stat-sub">Danışan başına sağlıklı verim</div>
+      </div>
+    </section>
+
+    <!-- SECTION: DANIŞANLAR LİSTESİ -->
+    <section>
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="fa-solid fa-clipboard-user" style="color:#6366f1;"></i>
+          Danışanlar ve Hedef Durumları
+        </h2>
+      </div>
+
+      <div class="users-grid" id="usersGridContainer">
+        <!-- Rendered via admin.js -->
+      </div>
+    </section>
+
+    <!-- SECTION: GÖNDERİLEN BİLDİRİMLER LİSTESİ -->
+    <section class="log-card">
+      <div class="section-header" style="margin-bottom: 16px;">
+        <h3 class="section-title" style="font-size: 19px;">
+          <i class="fa-solid fa-paper-plane" style="color:#10b981;"></i>
+          Son Gönderilen Motivasyon & Uyarı Bildirimleri
+        </h3>
+      </div>
+
+      <table class="notif-table">
+        <thead>
+          <tr>
+            <th>Danışan</th>
+            <th>Kategori</th>
+            <th>Gönderilen Mesaj</th>
+            <th>Zaman</th>
+          </tr>
+        </thead>
+        <tbody id="notifLogTableBody">
+          <!-- Rendered via admin.js -->
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+
+  <!-- PING / NOTIFICATION MODAL -->
+  <div class="modal-overlay" id="pingModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i class="fa-solid fa-paper-plane" style="color: #6366f1; margin-right: 8px;"></i>
+          <span id="modalRecipientName">Danışan</span> Kişisine Bildirim Gönder
+        </h3>
+        <button class="close-modal-btn" id="closeModalBtn">&times;</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Bildirim Türü</label>
+        <select class="form-select" id="notifTypeSelect">
+          <option value="congrats">🌟 Tebrik & Başarı Motivasyonu</option>
+          <option value="warning">⚠️ Düşük Kalori Uyarısı (Aç Kalma Kalkanı)</option>
+          <option value="reminder">💧 Su İçme Hatırlatması</option>
+          <option value="info">🥗 Sağlıklı Ara Öğün Tavsiyesi</option>
+        </select>
+      </div>
+
+      <!-- Quick Templates -->
+      <div class="form-group">
+        <label class="form-label">Hızlı Şablonlar (Tek tıkla doldur):</label>
+        <div class="template-pills">
+          <button type="button" class="template-btn" onclick="applyTemplate('congrats')">🌟 Harika Gidiyorsun</button>
+          <button type="button" class="template-btn" onclick="applyTemplate('warning')">⚠️ Az Yedin, Ara Öğün Yap</button>
+          <button type="button" class="template-btn" onclick="applyTemplate('water')">💧 Suyunu Unutma</button>
+          <button type="button" class="template-btn" onclick="applyTemplate('snack')">🥗 Akşam Önerisi</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Mesaj İçeriği</label>
+        <textarea class="form-textarea" id="notifMessageInput" placeholder="Danışanına iletilecek mesajı yaz..."></textarea>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 24px;">
+        <button type="button" class="btn-send-notif" id="sendNotifBtn">
+          <i class="fa-solid fa-paper-plane"></i> Bildirimi Canlı Gönder
+        </button>
+        <button type="button" class="btn-header" id="cancelModalBtn" style="padding: 12px 20px;">İptal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUPABASE JS SDK VIA CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

@@ -142,3 +142,27 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
+
+
+-- 5. BİLDİRİMLER & KOÇLUK PANELİ (Admin & Danışan Mesajlaşma)
+create table if not exists public.notifications (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users on delete cascade not null,
+  title text not null,
+  message text not null,
+  type text check (type in ('warning', 'congrats', 'info', 'reminder')) default 'info',
+  is_read boolean default false,
+  created_at timestamptz default now() not null
+);
+
+alter table public.notifications enable row level security;
+
+create policy "Kullanıcılar kendi bildirimlerini okuyabilir"
+  on public.notifications for select using (auth.uid() = user_id);
+
+create policy "Kullanıcılar bildirimlerini güncelleyebilir"
+  on public.notifications for update using (auth.uid() = user_id);
+
+create policy "Bildirim ekleme izni"
+  on public.notifications for insert with check (true);
+

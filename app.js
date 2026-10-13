@@ -57,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('onboardingModal').style.display = 'none';
     refreshAllViews();
   }
+  checkCoachNotifications();
 });
 
 /* ==========================================================================
@@ -788,4 +789,31 @@ function showToast(message, type = 'success') {
     toast.style.transform = 'translateY(12px)';
     setTimeout(() => toast.remove(), 300);
   }, 3500);
+}
+
+/* ==========================================================================
+   COACH / ADMIN INCOMING NOTIFICATIONS
+   ========================================================================= */
+function checkCoachNotifications() {
+  try {
+    const list = JSON.parse(localStorage.getItem('fitpulse_admin_sent_notifications') || '[]');
+    if (list.length > 0) {
+      // En son gönderilen bildirimi bul
+      const latest = list[0];
+      if (!latest.is_dismissed) {
+        const banner = document.getElementById('coachNotifBanner');
+        if (banner) {
+          document.getElementById('coachNotifTitle').textContent = latest.title || '💬 Koçundan Yeni Mesaj';
+          document.getElementById('coachNotifText').textContent = latest.message;
+          banner.style.display = 'flex';
+
+          document.getElementById('dismissCoachNotifBtn').onclick = () => {
+            latest.is_dismissed = true;
+            localStorage.setItem('fitpulse_admin_sent_notifications', JSON.stringify(list));
+            banner.style.display = 'none';
+          };
+        }
+      }
+    }
+  } catch (e) {}
 }
