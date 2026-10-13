@@ -1,0 +1,31 @@
+# Gizli & Hassas Dosyalar
+GITHUB_TOKEN.txt
+*.env
+*.env.*
+!.env.example
+
+# Bağımlılıklar
+node_modules/
+
+# Expo & Derleme Çıktıları
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Editör ve Araç Dosyaları
+.claude/
+.vscode/
+.idea/
+
+# Debug ve Loglar
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# Sistem Dosyaları
+.DS_Store
+Thumbs.db
+*.pem
+*.key
+*.tsbuildinfo

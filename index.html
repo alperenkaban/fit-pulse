@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FitPulse • Akıllı & Sağlıklı Kilo ve Metabolizma Takibi</title>
+  <meta name="description" content="Ölüm diyetlerine son! Bilimsel BMR ve TDEE hesaplama, dinamik kalori takibi ve takvim tabanlı akıllı kilo yönetimi.">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome for modern icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Background Glow Effects -->
+  <div class="bg-glow glow-1"></div>
+  <div class="bg-glow glow-2"></div>
+  <div class="bg-glow glow-3"></div>
+
+  <!-- ONBOARDING MODAL / PROFIL OLUŞTURMA -->
+  <div id="onboardingModal" class="modal-overlay">
+    <div class="modal-card onboarding-card">
+      <div class="modal-header">
+        <div class="brand-badge"><i class="fa-solid fa-heart-pulse"></i> Sağlıklı Yaşam & Form Kulübü</div>
+        <h2>Hoş Geldin! ✨ Seni Tanıyalım</h2>
+        <p class="subtitle">Aç kalarak değil, metabolizmanı çalıştırarak hedefine ulaşacaksın. Birkaç temel bilgini alalım:</p>
+      </div>
+      
+      <form id="profileForm" class="form-grid">
+        <div class="form-group full-width">
+          <label for="userName"><i class="fa-regular fa-user"></i> Adın / Lakabın</label>
+          <input type="text" id="userName" placeholder="Örn: Ayşe" required>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fa-solid fa-venus-mars"></i> Cinsiyet</label>
+          <div class="radio-toggle-group">
+            <label class="radio-pill">
+              <input type="radio" name="gender" value="female" checked>
+              <span><i class="fa-solid fa-venus"></i> Kadın</span>
+            </label>
+            <label class="radio-pill">
+              <input type="radio" name="gender" value="male">
+              <span><i class="fa-solid fa-mars"></i> Erkek</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="userAge"><i class="fa-regular fa-calendar-check"></i> Yaş</label>
+          <input type="number" id="userAge" placeholder="24" min="14" max="99" required>
+        </div>
+
+        <div class="form-group">
+          <label for="userHeight"><i class="fa-solid fa-ruler-vertical"></i> Boy (cm)</label>
+          <input type="number" id="userHeight" placeholder="168" min="100" max="230" required>
+        </div>
+
+        <div class="form-group">
+          <label for="userWeight"><i class="fa-solid fa-weight-scale"></i> Güncel Kilo (kg)</label>
+          <input type="number" id="userWeight" step="0.1" placeholder="64.5" min="30" max="250" required>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="targetWeight"><i class="fa-solid fa-bullseye"></i> Hedef Kilo (kg)</label>
+          <input type="number" id="targetWeight" step="0.1" placeholder="56.0" min="30" max="250" required>
+          <span class="field-hint">Aç kalmadan, sağlıklı ve kalıcı olarak ulaşacağımız hedef.</span>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="activityLevel"><i class="fa-solid fa-briefcase"></i> Nasıl Bir İşte Çalışıyorsun? (Aktivite Seviyen)</label>
+          <div class="custom-select-wrapper">
+            <select id="activityLevel" required>
+              <option value="1.2">🛋️ Masa Başı / Hareketsiz (Ofis, evden çalışma, az hareket)</option>
+              <option value="1.375" selected>🚶‍♀️ Hafif Hareketli (Öğretmen, satış, gün içi hafif tempolu yürüyüş)</option>
+              <option value="1.55">🏃‍♀️ Orta Hareketli (Sürekli ayakta, koşturmacalı veya haftada 3-4 gün spor)</option>
+              <option value="1.725">⚡ Çok Hareketli (Ağır fiziksel iş veya haftada 6 gün yoğun antrenman)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-actions full-width">
+          <button type="submit" class="btn btn-primary btn-large">
+            <span>Metabolizma Planımı Başlat</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MAIN APP CONTAINER -->
+  <div class="app-layout" id="mainApp">
+    
+    <!-- TOP NAVIGATION -->
+    <header class="top-nav">
+      <div class="nav-left">
+        <div class="logo-box">
+          <i class="fa-solid fa-fire-flame-curved logo-icon"></i>
+          <div>
+            <h1 class="logo-title">FitPulse</h1>
+            <span class="logo-tag">Akıllı Metabolizma & Form Takibi</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-center">
+        <div class="alert-pill-safe" id="healthShield">
+          <i class="fa-solid fa-shield-heart"></i>
+          <span>Metabolizma Koruması: <strong>Aktif</strong></span>
+        </div>
+      </div>
+
+      <div class="nav-right">
+        <div class="user-profile-badge" id="profileBadgeBtn" title="Profili Güncelle">
+          <div class="user-avatar" id="navAvatar">A</div>
+          <div class="user-info-text">
+            <span class="user-name-display" id="navUserName">Kullanıcı</span>
+            <span class="user-target-display" id="navTargetHint">Hedef: -- kg</span>
+          </div>
+          <i class="fa-solid fa-gear settings-icon"></i>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT WRAPPER -->
+    <main class="main-content">
+
+      <!-- WELCOME & SMART HERO BANNER -->
+      <section class="hero-status-card">
+        <div class="hero-content">
+          <div class="greeting-row">
+            <h2 id="welcomeGreeting">Günaydın, Hoş Geldiniz! ✨</h2>
+            <div class="badge-health">
+              <i class="fa-solid fa-shield-heart"></i> Bilimsel Form & Metabolizma Takibi
+            </div>
+          </div>
+          <p class="hero-quote" id="dailyMotivationalQuote">
+            "Metabolizmanı dengeli besinlerle yakıtla ki yağları yaksın. Bugün güçlü ve enerjik bir gün olsun."
+          </p>
+
+          <div class="hero-quick-stats">
+            <div class="quick-stat">
+              <span class="stat-label">Başlangıç Kilo</span>
+              <span class="stat-val" id="heroStartWeight">-- kg</span>
+            </div>
+            <div class="stat-arrow"><i class="fa-solid fa-arrow-trend-down"></i></div>
+            <div class="quick-stat">
+              <span class="stat-label">Son Ölçülen Kilo</span>
+              <span class="stat-val highlight" id="heroCurrentWeight">-- kg</span>
+            </div>
+            <div class="stat-arrow"><i class="fa-solid fa-bullseye"></i></div>
+            <div class="quick-stat">
+              <span class="stat-label">Hedef Kilo</span>
+              <span class="stat-val" id="heroTargetWeight">-- kg</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="quick-stat progress-stat">
+              <span class="stat-label">Hedefe Kalan</span>
+              <span class="stat-val accent" id="heroRemainingWeight">-- kg</span>
+            </div>
+            <div class="quick-stat eta-stat">
+              <span class="stat-label"><i class="fa-regular fa-clock"></i> Tahmini Varış</span>
+              <span class="stat-val green" id="heroEtaDays">-- gün (~-- hafta)</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CRASH DIET EMERGENCY WARNING BANNER (Hidden by default, triggered when user eats too little) -->
+      <section class="danger-banner" id="crashDietAlertBox" style="display: none;">
+        <div class="danger-icon-box">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div class="danger-content">
+          <h3>🚨 DİKKAT: YETERSİZ KALORİ UYARISI!</h3>
+          <p id="crashDietAlertMessage">
+            Bugünkü kalori alımın Bazal Metabolizmanın çok altında! Metabolizmanın yavaşlamaması ve kas kaybetmemen için lütfen en az bazal metabolizma kadar sağlıklı besin tüket!
+          </p>
+        </div>
+        <button class="btn btn-warning-action" id="dismissAlertBtn">Tamam, Bir Şeyler Yiyorum! 🥑</button>
+      </section>
+
+      <!-- METABOLISM & METRICS ROW -->
+      <section class="metrics-grid">
+        <!-- BMR CARD -->
+        <div class="metric-card glass-card">
+          <div class="metric-card-header">
+            <div class="icon-wrap purple"><i class="fa-solid fa-bolt"></i></div>
+            <div>
+              <h3>Bazal Metabolizma (BMR)</h3>
+              <p>Yatakta hiç kıpırdamadan yaktığın kalori</p>
+            </div>
+          </div>
+          <div class="metric-number-display">
+            <span class="number-big" id="bmrDisplay">----</span>
+            <span class="unit">kcal / gün</span>
+          </div>
+          <div class="metric-footer-note">
+            <i class="fa-solid fa-circle-info"></i> Bu kalorinin <strong>altına ASLA düşülmemelidir</strong>. Organların için şarttır!
+          </div>
+        </div>
+
+        <!-- TDEE CARD -->
+        <div class="metric-card glass-card">
+          <div class="metric-card-header">
+            <div class="icon-wrap orange"><i class="fa-solid fa-fire"></i></div>
+            <div>
+              <h3>Günlük Toplam Harcama (TDEE)</h3>
+              <p>İş tempon ve hareketinle yaktığın enerji</p>
+            </div>
+          </div>
+          <div class="metric-number-display">
+            <span class="number-big" id="tdeeDisplay">----</span>
+            <span class="unit">kcal / gün</span>
+          </div>
+          <div class="metric-footer-note" id="activityNoteText">
+            <i class="fa-solid fa-person-walking"></i> İş aktivite katsayısı: 1.375
+          </div>
+        </div>
+
+        <!-- RECOMMENDED DEFICIT CARD -->
+        <div class="metric-card glass-card featured-metric">
+          <div class="metric-card-header">
+            <div class="icon-wrap green"><i class="fa-solid fa-apple-whole"></i></div>
+            <div>
+              <h3>Önerilen Günlük Kalori</h3>
+              <p>Aç kalmadan, yağ yakan altın hedef</p>
+            </div>
+          </div>
+          <div class="metric-number-display">
+            <span class="number-big accent-green" id="targetCalorieDisplay">----</span>
+            <span class="unit">kcal / gün</span>
+          </div>
+          <div class="metric-footer-note">
+            <i class="fa-solid fa-circle-check"></i> Günde ~400-500 kcal açıkla ayda ~2 kg net yağ kaybı sağlar.
+          </div>
+        </div>
+      </section>
+
+      <!-- TWO COLUMNS: CALENDAR & LOGGING vs PROGRESS & REWARDS -->
+      <div class="content-split-grid">
+        
+        <!-- LEFT: CALENDAR & DAILY LOG -->
+        <div class="split-col main-calendar-col">
+          <div class="card calendar-card">
+            <div class="calendar-header">
+              <div class="cal-title-box">
+                <h2><i class="fa-regular fa-calendar-days"></i> Kalori & Kilo Takvimi</h2>
+                <p>Günü seç, aldığın kaloriyi ve tartı sonucunu kaydet</p>
+              </div>
+              <div class="cal-nav-controls">
+                <button class="cal-btn" id="prevMonthBtn" title="Önceki Ay"><i class="fa-solid fa-chevron-left"></i></button>
+                <span class="current-month-display" id="monthYearDisplay">Ekim 2026</span>
+                <button class="cal-btn" id="nextMonthBtn" title="Sonraki Ay"><i class="fa-solid fa-chevron-right"></i></button>
+                <button class="cal-btn today-btn" id="todayBtn">Bugün</button>
+              </div>
+            </div>
+
+            <!-- Calendar Days Header -->
+            <div class="calendar-weekdays">
+              <span>Pzt</span><span>Sal</span><span>Çar</span><span>Per</span><span>Cum</span><span>Cmt</span><span>Paz</span>
+            </div>
+
+            <!-- Dynamic Days Grid -->
+            <div class="calendar-days-grid" id="calendarDaysGrid">
+              <!-- Rendered via JS -->
+            </div>
+
+            <!-- Calendar Legend -->
+            <div class="calendar-legend">
+              <div class="legend-item"><span class="legend-dot green"></span> İdeal / Sağlıklı Kalori</div>
+              <div class="legend-item"><span class="legend-dot yellow"></span> Fazla / Denge Günü</div>
+              <div class="legend-item"><span class="legend-dot red"></span> Kritik Düşük Kalori (&lt;1000 kcal)</div>
+              <div class="legend-item"><span class="legend-dot blue"></span> Tartı Kaydı Var</div>
+            </div>
+          </div>
+
+          <!-- SELECTED DAY DETAIL & QUICK INPUT -->
+          <div class="card selected-day-card" id="dayDetailCard">
+            <div class="selected-day-header">
+              <div>
+                <span class="tag-date" id="selectedDateTitle">13 Ekim 2026, Salı</span>
+                <h3 id="selectedDateHeading">Bugünün Kayıtları</h3>
+              </div>
+              <div class="day-status-pill" id="dayStatusBadge">
+                <i class="fa-regular fa-circle-question"></i> Kayıt Yok
+              </div>
+            </div>
+
+            <form id="dailyLogForm" class="daily-form">
+              <div class="input-row">
+                <div class="input-field">
+                  <label for="logWeight"><i class="fa-solid fa-weight-scale"></i> Günün Kilosu (kg)</label>
+                  <div class="input-with-unit">
+                    <input type="number" id="logWeight" step="0.1" placeholder="Örn: 63.8">
+                    <span>kg</span>
+                  </div>
+                  <small class="help-text">Kilo girince Bazal Metabolizman ve kalan süren anında güncellenir!</small>
+                </div>
+
+                <div class="input-field">
+                  <label for="logCalories"><i class="fa-solid fa-fire"></i> Alınan Toplam Kalori (kcal)</label>
+                  <div class="input-with-unit">
+                    <input type="number" id="logCalories" placeholder="Örn: 1550">
+                    <span>kcal</span>
+                  </div>
+                  <small class="help-text">Hedef: <strong id="logTargetRef">1600</strong> kcal (Aç kalmak yasak!)</small>
+                </div>
+              </div>
+
+              <!-- Water Tracker Widget -->
+              <div class="water-tracker-row">
+                <div class="water-label">
+                  <i class="fa-solid fa-droplet text-blue"></i>
+                  <span>Su Tüketimi: <strong id="waterCountDisplay">0</strong> / 8 Bardak (2 Litre)</span>
+                </div>
+                <div class="water-glasses-row" id="waterGlassesContainer">
+                  <!-- 8 glasses clickable -->
+                </div>
+              </div>
+
+              <!-- Day Notes / Mood -->
+              <div class="input-field">
+                <label for="logNotes"><i class="fa-regular fa-note-sticky"></i> Günün Notu & Hissiyatın</label>
+                <input type="text" id="logNotes" placeholder="Örn: 'Bugün enerjim harikaydı, hiç aç hissetmedim!'">
+              </div>
+
+              <div class="day-form-actions">
+                <button type="submit" class="btn btn-primary" id="saveLogBtn">
+                  <i class="fa-solid fa-floppy-disk"></i> Günlük Kaydı Kaydet
+                </button>
+                <button type="button" class="btn btn-secondary" id="clearLogBtn">
+                  <i class="fa-solid fa-trash-can"></i> Günü Temizle
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- RIGHT: CHARTS, REWARDS & STATS -->
+        <div class="split-col side-stats-col">
+
+          <!-- WEIGHT PROGRESS VISUALIZER & CHART -->
+          <div class="card progress-card">
+            <div class="card-header-simple">
+              <h3><i class="fa-solid fa-chart-line"></i> Kilo İlerleme Grafiği</h3>
+              <span class="badge-tag">Günlük Değişim</span>
+            </div>
+            
+            <div class="chart-container">
+              <canvas id="weightProgressCanvas" width="400" height="220"></canvas>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-bar-box">
+              <div class="progress-labels">
+                <span id="pbStartLabel">Başlangıç: -- kg</span>
+                <span id="pbPercentLabel">%0 Başarıldı</span>
+                <span id="pbTargetLabel">Hedef: -- kg</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" id="progressFillBar" style="width: 0%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SMART MOTIVATION & REWARDS CARD -->
+          <div class="card rewards-card">
+            <div class="card-header-simple">
+              <h3><i class="fa-solid fa-trophy"></i> Kilitli Başarı Rozetleri</h3>
+              <span class="badge-tag pink">Aç Kalmadan Kazanılanlar</span>
+            </div>
+            <p class="card-intro-text">
+              Hedefine sağlıklı şekilde yaklaştıkça kilitler açılır!
+            </p>
+
+            <div class="rewards-list" id="rewardsListContainer">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+      <p>FitPulse • Sağlıklı, fit ve enerjik bir yaşam için.</p>
+    </footer>
+
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- EDIT PROFILE MODAL (Triggered via header settings button) -->
+  <div id="editProfileModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <button class="close-modal-btn" id="closeProfileModalBtn"><i class="fa-solid fa-xmark"></i></button>
+        <h2><i class="fa-solid fa-user-pen"></i> Profil & Hedef Düzenle</h2>
+        <p class="subtitle">Boy, kilo veya hedefinde güncelleme mi var?</p>
+      </div>
+
+      <form id="editProfileForm" class="form-grid">
+        <div class="form-group full-width">
+          <label for="editUserName">Ad / İsim</label>
+          <input type="text" id="editUserName" required>
+        </div>
+        <div class="form-group">
+          <label>Cinsiyet</label>
+          <div class="radio-toggle-group">
+            <label class="radio-pill">
+              <input type="radio" name="editGender" value="female">
+              <span>Kadın</span>
+            </label>
+            <label class="radio-pill">
+              <input type="radio" name="editGender" value="male">
+              <span>Erkek</span>
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="editAge">Yaş</label>
+          <input type="number" id="editAge" required>
+        </div>
+        <div class="form-group">
+          <label for="editHeight">Boy (cm)</label>
+          <input type="number" id="editHeight" required>
+        </div>
+        <div class="form-group">
+          <label for="editWeight">Güncel Kilo (kg)</label>
+          <input type="number" id="editWeight" step="0.1" required>
+        </div>
+        <div class="form-group full-width">
+          <label for="editTargetWeight">Hedef Kilo (kg)</label>
+          <input type="number" id="editTargetWeight" step="0.1" required>
+        </div>
+        <div class="form-group full-width">
+          <label for="editActivity">İş & Günlük Hareket Seviyesi</label>
+          <div class="custom-select-wrapper">
+            <select id="editActivity">
+              <option value="1.2">🛋️ Masa Başı / Hareketsiz (Ofis, evden çalışma)</option>
+              <option value="1.375">🚶‍♀️ Hafif Hareketli (Öğretmen, satış, hafif tempo)</option>
+              <option value="1.55">🏃‍♀️ Orta Hareketli (Sürekli ayakta, 3-4 gün spor)</option>
+              <option value="1.725">⚡ Çok Hareketli (Yoğun tempo, ağır iş)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-actions full-width" style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button type="submit" class="btn btn-primary" style="flex: 1;">Değişiklikleri Kaydet</button>
+          <button type="button" class="btn btn-secondary" id="cancelEditProfileBtn">İptal</button>
+          <button type="button" class="btn btn-secondary" id="resetAllDataBtn" style="color: #f87171; border-color: rgba(239, 68, 68, 0.3);" title="Tüm verileri silip baştan tanışma ekranını açar"><i class="fa-solid fa-arrow-rotate-left"></i> Sıfırla</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
