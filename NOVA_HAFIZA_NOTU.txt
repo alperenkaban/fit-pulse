@@ -1,0 +1,37 @@
+================================================================================
+FITPULSE • NOVA GELİSTİRİCİ HAFIZA NOTU & PROJE DURUM KILAVUZU
+Son Güncelleme: 13 Ekim 2026 | Asistan: Nova | Proje Sahibi: Alperen
+================================================================================
+
+1. KİMLİK VE AMAC:
+- Asistan Adı: Nova (Samimi, enerjik, dikkatli ve proaktif kodlama ortağı).
+- Proje: FitPulse (Metabolizma dostu, crash diyet önleyici sağlık & kilo takip platformu).
+- Özel Amaç: Alperen'in yakın çevresi (özellikle kız arkadaşı Selin) için ölüm diyetlerini engellemek, BMR altı açlıkları tespit etmek ve Koç/Admin panelinden verileri takip edip motivasyon/uyarı bildirimi gönderebilmek.
+
+2. SUPABASE VERİTABANI (CANLI & AKTİF):
+- Supabase URL: https://ufolevhtefxmtjeeqxil.supabase.co
+- Anon / Publishable Key: sb_publishable_SdHTchHRadcFHQnI2TAytA_BcrFM6Fs
+- SQL Durumu: "Success. No rows returned" ile 4 tablo ve RLS kuralları tam kuruldu.
+- Tablolar:
+  * profiles (Kullanıcı profilleri, boy, kilo, BMR, hedefler)
+  * weight_logs (Tarih bazlı kilo geçmişi)
+  * meal_logs (Öğünler, kaloriler, protein, karb, yağ)
+  * notifications (Admin panelinden kullanıcılara giden bildirimler)
+- RLS Politikaları: Idempotent (DROP POLICY IF EXISTS) yapıda ve Admin okuma yetkisi tanımlı.
+
+3. BAŞLATICI DOSYALAR:
+- Web Danışan Paneli: Uygulamayı_Baslat.bat (index.html, http://localhost:8085)
+- Koç / Admin Paneli: Admin_Panelini_Baslat.bat (admin.html, http://localhost:8085/admin.html)
+- Mobil Uygulama: Mobilyi_Baslat.bat (mobile/ klasöründe Expo)
+
+4. MEVCUT DURUM:
+- Web Arayüzü: Tamamlandı (BMR/TDEE, Crash diet uyarıları, su sayacı, koç bildirim çubuğu).
+- Koç Paneli: Tamamlandı (Kullanıcı listesi, risk tespiti, canlı bildirim gönderme).
+- Expo Mobil: TypeScript 0 hata ile hazır.
+- GitHub: https://github.com/alperenkaban/fit-pulse (Tüm kodlar pushlandı).
+
+5. SONRAKİ OTURUMDA YAPILACAKLAR:
+- Mobil uygulamayı Expo Go ile telefonda test etmek.
+- Faz 2: Danışanın öğün ekleme ve besin arama motoru (meal_logs canlı yazma).
+- Supabase Realtime ile anlık bildirim dinleyicisi.
+================================================================================
