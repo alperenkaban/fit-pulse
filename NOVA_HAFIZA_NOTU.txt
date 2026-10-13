@@ -19,9 +19,11 @@ Son Güncelleme: 13 Ekim 2026 | Asistan: Nova | Proje Sahibi: Alperen
   * notifications (Admin panelinden kullanıcılara giden bildirimler)
 - RLS Politikaları: Idempotent (DROP POLICY IF EXISTS) yapıda ve Admin okuma yetkisi tanımlı.
 
-3. BAŞLATICI DOSYALAR:
-- Web Danışan Paneli: Uygulamayı_Baslat.bat (index.html, http://localhost:8085)
-- Koç / Admin Paneli: Admin_Panelini_Baslat.bat (admin.html, http://localhost:8085/admin.html)
+3. CANLI İNTERNET LİNKLERİ & BAŞLATICILAR:
+- Canlı Danışan Web URL: https://alperenkaban.github.io/fit-pulse/
+- Canlı Koç / Admin URL: https://alperenkaban.github.io/fit-pulse/admin.html
+- Web Danışan Paneli (Yerel): Uygulamayı_Baslat.bat (index.html, http://localhost:8085)
+- Koç / Admin Paneli (Yerel): Admin_Panelini_Baslat.bat (admin.html, http://localhost:8085/admin.html)
 - Mobil Uygulama: Mobilyi_Baslat.bat (mobile/ klasöründe Expo)
 
 4. MEVCUT DURUM:

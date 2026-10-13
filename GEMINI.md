@@ -31,8 +31,8 @@
 ## 💻 3. Bileşenler & Başlatma Komutları
 | Bileşen | Dosyalar | Başlatıcı / URL |
 |---|---|---|
-| **Web Ön Yüz (Danışan)** | `index.html`, `app.js`, `style.css` | `Uygulamayı_Baslat.bat` veya `http://localhost:8085/` |
-| **Koç / Admin Paneli** | `admin.html`, `admin.js`, `admin.css` | `Admin_Panelini_Baslat.bat` veya `http://localhost:8085/admin.html` |
+| **Web Ön Yüz (Danışan)** | `index.html`, `app.js`, `style.css` | `https://alperenkaban.github.io/fit-pulse/` veya `Uygulamayı_Baslat.bat` |
+| **Koç / Admin Paneli** | `admin.html`, `admin.js`, `admin.css` | `https://alperenkaban.github.io/fit-pulse/admin.html` veya `Admin_Panelini_Baslat.bat` |
 | **Mobil Uygulama (Expo)** | `mobile/` (React Native, TypeScript) | `Mobilyi_Baslat.bat` (`npx expo start --clear`) |
 | **Veritabanı Şeması** | `supabase/schema.sql` | Supabase SQL Editor |
 
